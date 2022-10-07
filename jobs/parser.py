@@ -4,7 +4,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import re
 
-from .confidential import DATABASE_CONNECTION
+from confidential import DATABASE_CONNECTION
 
 
 global headers
@@ -30,14 +30,18 @@ class Page(object):
 
     def get_links(self):
         links = []
-        for link in self.page_urls:
+        for page_url in self.page_urls:
             try:
-                req = urlopen(Request(url=link, headers=headers))
+                req = urlopen(Request(url=page_url, headers=headers))
                 soup = BeautifulSoup(req, 'html.parser')
-                links.append(soup.findAll('a', class_='serp-item__title')['href'])
-            except: continue
-        return links
+                for link in soup.find_all('a', class_='serp-item__title'):
+                    links.append(link['href'])
+            except Exception as e: 
+                print('ERROR IN get_links:', e)
+                continue
 
+        print('NUMBER OF LINKS:', len(links))
+        return links
 
 
 class Listing(object):
@@ -45,13 +49,11 @@ class Listing(object):
         self.link = link
         self.elements = elements
 
-
     def open_link(self):
         try:
             req = Request(url=self.link, headers=headers)
             return BeautifulSoup(urlopen(req), 'html.parser')
         except: return
-
 
     def scrape_data(self):
         soup = self.open_link()
@@ -61,8 +63,8 @@ class Listing(object):
                 try:
                     scraped[k] = list(set(i.get_text() for i in soup.find_all(v[0], attrs=v[1])))
                 except: scraped[k] = None
+            print('DATA SCRAPED:', self.link)
             return scraped
-
 
     def clean_data(self):
         data = self.scrape_data()
@@ -86,8 +88,10 @@ class Listing(object):
 
         def parse_salary():
             split_salary = lambda x, y: int(re.search(r'\d+', x.rsplit(y, 1)[1]).group()) if x else None
-            data['salary_from'] = split_salary(data['salary'], 'от')
-            data['salary_to'] = split_salary(data['salary'], 'до')
+            try: data['salary_from'] = split_salary(data['salary'], 'от')
+            except: data['salary_from'] = None
+            try: data['salary_to'] = split_salary(data['salary'], 'до')
+            except: data['salary_to'] = None
             
             stopwords = ['от', 'до', 'руб.']
             filtered = lambda x: x.lower() not in stopwords and not x.isdigit()
@@ -100,8 +104,9 @@ class Listing(object):
         parse_employment()
         parse_salary()
 
-        return data
+        print('DATA CLEANED:', self.link)
 
+        return data
 
 
 class Connection(object):  
@@ -110,24 +115,23 @@ class Connection(object):
         self.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         self.cursor = self.connection.cursor()
 
+        print('CONNECTION ESTABLISHED')
 
     def __enter__(self):
         return self.cursor
-
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type and exc_value:
             self.connection.rollback()
         self.cursor.close()
         self.connection.close()
+        print('CONNECTION CLOSED')
         return False
-
 
 
 class Database(object):
     def __init__(self, data):
         self.data = data
-
 
     def write_to_db(self): 
         with Connection() as cursor:
@@ -229,31 +233,6 @@ class Database(object):
                 """
                 for skill in self.data['skills']:
                     cursor.execute(query3, (skill, listing_id))
+
+                print('DATA INSERTED:', self.data['url'])
         return
-
-
-
-elements = {
-    'title': ('h1', {'data-qa': 'vacancy-title'}),
-    'address': ('span', {'data-qa': 'vacancy-view-raw-address'}),
-    'city': ('p', {'data-qa': 'vacancy-view-location'}),
-    'salary': ('span', {'data-qa': 'vacancy-salary-compensation-type-net'}),
-    'employer': ('div', {'data-qa': 'vacancy-company__details'}),
-    'experience': ('span', {'data-qa': 'vacancy-experience'}),
-    'employment_modes': ('p', {'data-qa': 'vacancy-view-employment-mode'}),
-    'date': ('p', 'vacancy-creation-time-redesigned'),
-    'skills': ('span', 'bloko-tag__section_text'),
-    'description': ('div', {'data-qa': 'vacancy-description'}),
-}
-
-
-page = Page(area=2, role=96, text='Python', period=7)
-# links = page.get_links()
-
-links = ['https://spb.hh.ru/vacancy/69588961', 'https://spb.hh.ru/vacancy/69793122']
-
-for link in links:
-    listing = Listing(link, elements)
-    data = listing.clean_data()
-    database = Database(data)
-    database.write_to_db()
