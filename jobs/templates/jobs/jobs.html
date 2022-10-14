@@ -2,9 +2,41 @@
 {% block content %}
 
 <main>
-<div>TEST</div>
-{% for job in jobs %}
-{% endfor %}
-</main>
+    <div class="container-fluid mx-auto w-75 p-3 mb-5">
+        <h1 class="mt-5 mb-3 text-light">Вакансии для Python-разработчиков</h1>
+        {% for job in jobs %}
+        <div class="card px-3 py-3 mb-3">
+            <a href="{% url 'job' job.id %}" class="text-decoration-none">
+                <p><strong>Должность: </strong>{{job.title}}</p>
+                
+                {% if job.salary_from and job.salary_to %}
+                <p><strong>Зарплата: </strong>{{job.salary_from}}–{{job.salary_to}} тыс. руб.</p>
+                {% endif %}
 
+                {% if job.salary_from and not job.salary_to %}
+                <p><strong>Зарплата: </strong>от {{job.salary_from}} тыс. руб.</p>
+                {% endif %}
+
+                {% if job.salary_to and not job.salary_from %}
+                <p><strong>Зарплата: </strong>до {{job.salary_to}} тыс. руб.</p>
+                {% endif %}
+
+                {% if job.employer.employer %}
+                <p><strong>Работодатель: </strong>{{job.employer.employer}}</p>
+                {% endif %}
+
+                {% if job.address.city.city and not job.address.address %}
+                <p><strong>Город: </strong>{{job.address.city.city}}</p>
+                {% endif %}
+                
+                {% if job.address.address %}
+                <p><strong>Адрес: </strong>{{job.address.address}}</p>
+                {% endif %}
+
+                <a href="{% url 'job' job.id %}" class="btn btn-primary col-md-4">Смотреть полностью</a>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</main>
 {% endblock %}

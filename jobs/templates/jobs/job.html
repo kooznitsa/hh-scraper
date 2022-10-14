@@ -1,0 +1,58 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<main>
+    <div class="container-fluid mx-auto w-75 p-3 mb-5">
+        <h1 class="mt-5 mb-3 text-light">{{job.title}}</h1>
+        <div class="card px-3 py-3 mb-3">
+                {% if job.salary_from and job.salary_to %}
+                <p><strong>Зарплата: </strong>{{job.salary_from}}–{{job.salary_to}} тыс. руб.</p>
+                {% endif %}
+
+                {% if job.salary_from and not job.salary_to %}
+                <p><strong>Зарплата: </strong>от {{job.salary_from}} тыс. руб.</p>
+                {% endif %}
+
+                {% if job.salary_to and not job.salary_from %}
+                <p><strong>Зарплата: </strong>до {{job.salary_to}} тыс. руб.</p>
+                {% endif %}
+
+                {% if job.experience.experience %}
+                <p><strong>Опыт работы: </strong>{{job.experience.experience}}</p>
+                {% endif %}
+
+                <div class="d-flex flex-md-row flex-wrap">
+                    <p><strong>Режимы работы:</strong></p>
+                    {% for mode in modes %}
+                    <span class="badge rounded-pill bg-secondary px-2 py-2 mx-2 mb-2">{{mode.employment_mode.employment_mode}}</span>
+                    {% endfor %}
+                </div>
+
+                {% if job.employer.employer %}
+                <p><strong>Работодатель: </strong>{{job.employer.employer}}</p>
+                {% endif %}
+
+                {% if job.address.city.city and not job.address.address %}
+                <p><strong>Город: </strong>{{job.address.city.city}}</p>
+                {% endif %}
+                
+                {% if job.address.address %}
+                <p><strong>Адрес: </strong>{{job.address.address}}</p>
+                {% endif %}
+
+                {% if job.description %}
+                <p><strong>Описание: </strong>{{job.description}}</p>
+                {% endif %}
+
+                <div class="d-flex flex-md-row flex-wrap">
+                    <p><strong>Навыки:</strong></p>
+                    {% for skill in skills %}
+                    <span class="badge rounded-pill bg-primary px-2 py-2 mx-2 mb-2">{{skill.skill.skill}}</span>
+                    {% endfor %}
+                </div>
+
+                <a href="{{job.url}}" target="_blank" class="btn btn-secondary col-md-4 my-5">Перейти на сайт</a>
+        </div>
+    </div>
+</main>
+{% endblock %}

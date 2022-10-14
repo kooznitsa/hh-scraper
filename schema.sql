@@ -49,7 +49,7 @@ CREATE TABLE jobs (
 	salary_mode_id INTEGER NULL,
 	address_id INTEGER NULL,
 	experience_id INTEGER NULL,
-	date VARCHAR(50) NULL,
+	date DATE NULL,
 	description TEXT NULL,
 	employer_id INTEGER NULL,
 

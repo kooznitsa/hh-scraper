@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Jobs
+from django.db.models import Q
+from .models import Jobs, JobSkills, JobEmploymentModes
 
 
 def jobs(request):
@@ -10,5 +11,7 @@ def jobs(request):
 
 def job(request, pk):
     job = Jobs.objects.get(id=pk)
-    context = {'job': job}
+    skills = JobSkills.objects.filter(Q(job=job.id))
+    modes = JobEmploymentModes.objects.filter(Q(job=job.id))
+    context = {'job': job, 'skills': skills, 'modes': modes}
     return render(request, 'jobs/job.html', context)

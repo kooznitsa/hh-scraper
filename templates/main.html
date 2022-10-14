@@ -1,18 +1,20 @@
 <!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
 <html>
 
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Python Jobs</title>
-
+    <title>Вакансии для Python-разработчиков</title>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100" style="background-color: LightSlateGray">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">
+        <a href="/" class="text-light text-decoration-none">На главную</a>
+    </nav>
     {% block content %}
-
     {% endblock content %}
 </body>
 </html>

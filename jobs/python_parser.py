@@ -1,18 +1,11 @@
-from .parser import Page, Listing, Database
+import sys
+import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-elements = {
-    'title': ('h1', {'data-qa': 'vacancy-title'}),
-    'address': ('span', {'data-qa': 'vacancy-view-raw-address'}),
-    'city': ('p', {'data-qa': 'vacancy-view-location'}),
-    'salary': ('span', {'data-qa': 'vacancy-salary-compensation-type-net'}),
-    'employer': ('div', {'data-qa': 'vacancy-company__details'}),
-    'experience': ('span', {'data-qa': 'vacancy-experience'}),
-    'employment_modes': ('p', {'data-qa': 'vacancy-view-employment-mode'}),
-    'date': ('p', 'vacancy-creation-time-redesigned'),
-    'skills': ('span', 'bloko-tag__section_text'),
-    'description': ('div', {'data-qa': 'vacancy-description'}),
-}
+from jobs.parser import Page, Listing, Database
+from jobs.helpers import elements
 
 
 page = Page(area=2, role=96, text='Python', period=1)

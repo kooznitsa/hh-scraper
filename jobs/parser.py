@@ -3,12 +3,10 @@ from bs4 import BeautifulSoup
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import re
+from datetime import date
 
 from confidential import DATABASE_CONNECTION
-
-
-global headers
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
+from helpers import headers, months
 
 
 class Page(object):
@@ -66,6 +64,11 @@ class Listing(object):
             print('DATA SCRAPED:', self.link)
             return scraped
 
+    def convert_date(self, text):
+        ints = [months[m] if m in months else m for m in text.rstrip().split(' ')]
+        ints = list(map(int, ints))
+        return date(ints[2], ints[1], ints[0]).isoformat()    
+
     def clean_data(self):
         data = self.scrape_data()
         del_hardspace = lambda x: x.replace(u'\xa0', u' ')
@@ -80,6 +83,7 @@ class Listing(object):
         def parse_date():
             data['date'] = data['date'].rsplit('Вакансия опубликована ', 1)[1] \
                                 .rsplit('в ', 1)[0] if data['date'] else None
+            data['date'] = self.convert_date(data['date'])
             return data['date']
 
         def parse_employment():
