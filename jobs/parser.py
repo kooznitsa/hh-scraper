@@ -5,8 +5,8 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import re
 from datetime import date
 
-from confidential import DATABASE_CONNECTION
-from helpers import headers, months
+from .confidential import DATABASE_CONNECTION
+from .helpers import headers, months
 
 
 class Page(object):

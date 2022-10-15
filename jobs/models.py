@@ -4,6 +4,9 @@ from django.db import models
 class Cities(models.Model):
     city = models.CharField(unique=True, max_length=50, blank=True, null=True)
 
+    def __str__(self):
+        return self.city
+
     class Meta:
         managed = False
         db_table = 'cities'
@@ -12,6 +15,9 @@ class Cities(models.Model):
 class Employers(models.Model):
     city = models.ForeignKey(Cities, models.DO_NOTHING, blank=True, null=True)
     employer = models.CharField(unique=True, max_length=50)
+
+    def __str__(self):
+        return self.employer
 
     class Meta:
         managed = False
@@ -23,6 +29,9 @@ class Addresses(models.Model):
     employer = models.ForeignKey(Employers, models.DO_NOTHING)
     address = models.CharField(unique=True, max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return self.address
+
     class Meta:
         managed = False
         db_table = 'addresses'
@@ -30,6 +39,9 @@ class Addresses(models.Model):
 
 class EmploymentModes(models.Model):
     employment_mode = models.CharField(unique=True, max_length=255)
+
+    def __str__(self):
+        return self.employment_mode
 
     class Meta:
         managed = False
@@ -39,6 +51,9 @@ class EmploymentModes(models.Model):
 class Experiences(models.Model):
     experience = models.CharField(unique=True, max_length=50)
 
+    def __str__(self):
+        return self.experience
+
     class Meta:
         managed = False
         db_table = 'experiences'
@@ -46,6 +61,9 @@ class Experiences(models.Model):
 
 class SalaryModes(models.Model):
     salary_mode = models.CharField(unique=True, max_length=20)
+
+    def __str__(self):
+        return self.salary_mode
 
     class Meta:
         managed = False
@@ -64,6 +82,9 @@ class Jobs(models.Model):
     description = models.TextField(blank=True, null=True)
     employer = models.ForeignKey(Employers, models.DO_NOTHING, blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         managed = False
         db_table = 'jobs'
@@ -72,6 +93,9 @@ class Jobs(models.Model):
 
 class Skills(models.Model):
     skill = models.CharField(unique=True, max_length=300)
+
+    def __str__(self):
+        return self.skill
 
     class Meta:
         managed = False

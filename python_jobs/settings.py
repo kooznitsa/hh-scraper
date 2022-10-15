@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'jobs.apps.JobsConfig',
+    'rest_framework',
     'bootstrap5',
 ]
 
@@ -94,6 +95,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+CELERY_BROKER_URL = 'amqp://localhost'
 
 
 # Internationalization
