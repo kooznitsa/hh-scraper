@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from jobs.models import Jobs, Addresses, JobEmploymentModes, JobSkills
+
+from jobs.models import Jobs, Addresses, JobEmploymentModes, \
+        JobSkills, EmploymentModes, Skills
 
 
 class FlattenMixin(object):
@@ -27,19 +29,51 @@ class AddressesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Addresses
-        fields = ('address', 'city',)
+        fields = ('address', 'city')
+
+
+class EmploymentModesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmploymentModes
+        fields = ('employment_mode',)
+
+
+class SkillsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skills
+        fields = ('skill',)
+
+
+class JobEmploymentModesSerializer(serializers.ModelSerializer):
+    job_id = serializers.SerializerMethodField()
+    employment_mode_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = JobEmploymentModes
+        fields = ('job_id', 'employment_mode_id')
+
+    def get_job_id(self, obj):
+        return obj.job_id
+
+    def get_employment_mode_id(self, obj):
+        queryset = obj.__class__.objects.filter(pk=self.get_job_id(obj))
+        return [EmploymentModesSerializer(q).data for q in queryset]
 
 
 class JobSkillsSerializer(serializers.ModelSerializer):
-    employment_mode = serializers.SlugRelatedField(
-        many=True, 
-        read_only=True, 
-        slug_field='skill'
-    )
+    job_id = serializers.SerializerMethodField()
+    skill_id = serializers.SerializerMethodField()
 
     class Meta:
         model = JobSkills
-        fields = ('skill',)
+        fields = ('job_id', 'skill_id')
+
+    def get_job_id(self, obj):
+        return obj.job_id
+
+    def get_skill_id(self, obj):
+        queryset = obj.__class__.objects.filter(pk=self.get_job_id(obj))
+        return [SkillsSerializer(q).data for q in queryset]
 
 
 class JobsSerializer(FlattenMixin, serializers.ModelSerializer):
@@ -59,15 +93,3 @@ class JobsSerializer(FlattenMixin, serializers.ModelSerializer):
             'experience', 'employer'
         )
         flatten = [('address', AddressesSerializer)]
-
-
-class JobEmploymentModesSerializer(serializers.ModelSerializer):
-    job = JobsSerializer()
-    employment_mode = serializers.SlugRelatedField( 
-        read_only=True, 
-        slug_field='employment_mode'
-    )
-
-    class Meta:
-        model = JobEmploymentModes
-        fields = ('job', 'employment_mode')

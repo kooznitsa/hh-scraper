@@ -65,15 +65,18 @@ class Listing(object):
             return scraped
 
     def convert_date(self, text):
-        ints = [months[m] if m in months else m for m in text.rstrip().split(' ')]
-        ints = list(map(int, ints))
-        return date(ints[2], ints[1], ints[0]).isoformat()    
+        try:
+            ints = [months[m] if m in months else m for m in text.rstrip().split(' ')]
+            ints = list(map(int, ints))
+            return date(ints[2], ints[1], ints[0]).isoformat()
+        except:
+            return None    
 
     def clean_data(self):
         data = self.scrape_data()
         del_hardspace = lambda x: x.replace(u'\xa0', u' ')
         data = {k: list(map(del_hardspace, v)) for k, v in data.items()}
-        data = {k: ''.join(v) if len(v) < 2 else v for k, v in data.items()}
+        data = {k: ''.join(v) if len(v) < 2 and k != 'skills' else v for k, v in data.items()}
 
         def parse_city():
             if data['city'] == '':
