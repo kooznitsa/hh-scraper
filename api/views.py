@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from django.db.models import Q
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
