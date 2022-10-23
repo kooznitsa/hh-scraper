@@ -19,4 +19,4 @@ def scrape_jobs():
 
 while True:
     scrape_jobs()
-    sleep(150)
+    sleep(15)

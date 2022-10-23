@@ -1,10 +1,15 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render
 from django.db.models import Q
+
 from .models import Jobs, JobSkills, JobEmploymentModes
 
 
 def jobs(request):
-    jobs = Jobs.objects.all()
+    jobs = Jobs.objects.filter(
+        date__gte=datetime.now()-timedelta(days=1), address__city=1
+    ).order_by('id')
     context = {'jobs': jobs}
     return render(request, 'jobs/jobs.html', context)
 
